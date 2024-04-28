@@ -1,0 +1,13 @@
+name = "dof-dolar-price"
+main = "src/index.js"
+compatibility_date = "2024-03-07"
+workers_dev = true
+compatibility_flags = [ "nodejs_compat" ]
+
+[[kv_namespaces]]
+id = "774d8e0cc2634f4581cf2e36e91d5d13"
+binding = "fecha"
+
+[[kv_namespaces]]
+id = "774d8e0cc2634f4581cf2e36e91d5d13"
+binding = "precio"
