@@ -1,5 +1,6 @@
 import { getxml } from "./getxml";
 import { getDateBP } from "./getDateBP";
+import { saveDolar } from "./saveDolar";
 import { respuestatc } from "./respuestatc";
 
 export default {
@@ -9,19 +10,29 @@ export default {
 	 * @param {any} env - El entorno de ejecución.
 	 * @param {any} ctx - El contexto de ejecución.
 	 * @returns {Response} - La respuesta que contiene el valor del dólar en formato HTML.
-	*/
+	 */
 	async fetch(request, env, ctx) {
 		// Verificamos que la solicitud sea un método GET y que la URL sea la correcta
+		// #region Validaciones de la solicitud
 		const url = new URL(request.url);
 		if (request.method !== "GET") {
 			console.warn("Método no permitido");
 			return new Response("Método no permitido", { status: 405 });
-		}else if (url.pathname !== "/MX/tc_barmesa/_tipo-de-cambio.html") {
+		} else if (url.pathname !== "/MX/tc_barmesa/_tipo-de-cambio.html") {
 			console.warn("URL no permitida");
 			return new Response("URL no permitida", { status: 403 });
 		}
+		// #endregion
 		// Obtenemos el precio mínimo del dólar de la base de datos de clave-valor de DOF (con un tiempo de vida en caché de 1 hora)
-		const precioMinimoPermitido = Number(await env.kvdof.get("precioMinimo",{ cacheTtl: 3600 }));
+		const kVFecha = await env.kvdof.get("fecha", { cacheTtl: 3600 });
+		//console.log(`Fecha guardada: ${kVFecha}`);
+		const kVPrecio = Number(await env.kvdof.get("precio", { cacheTtl: 3600 })).toFixed(4);
+		//console.log(`Precio guardado: ${kVPrecio}`);
+		return respuestatc(kVFecha, kVPrecio);
+	},
+	async scheduled(event, env, ctx) {
+		const precioMinimoPermitido = Number(await env.kvdof.get("precioMinimo", { cacheTtl: 3600 })).toFixed(4);
+		console.log(`Precio minimo permitido: ${precioMinimoPermitido}`);
 		var xmlText = '';
 		// Intentamos obtener los datos XML de la URL proporcionada
 		xmlText = await getxml();
@@ -39,7 +50,7 @@ export default {
 
 		if (startIndex === -1 || endIndex === -1) {
 			console.warn('No se encontró el valor del dólar en el XML del DOF, Enviando ultima fecha y precio guardado en cache');
-			return respuestatc(await env.kvdof.get("fecha",{ cacheTtl: 3600 }), await env.kvdof.get("precio",{ cacheTtl: 3600 }));
+			return; // Terminate the execution without returning anything
 		}
 
 		// El precio del dólar se encuentra entre las etiquetas de descripción asi que lo extraemos y lo convertimos a un número
@@ -47,25 +58,18 @@ export default {
 		const descriptionStartIndex = itemContent.indexOf(descriptionStartTag) + descriptionStartTag.length;
 		const descriptionEndIndex = itemContent.indexOf(descriptionEndTag, descriptionStartIndex);
 		const dolarDescription = itemContent.substring(descriptionStartIndex, descriptionEndIndex);
-		const pubDateStartIndex = itemContent.indexOf(pubDateStartTag) + pubDateStartTag.length;;
+		const pubDateStartIndex = itemContent.indexOf(pubDateStartTag) + pubDateStartTag.length;
 		const pubDateEndIndex = itemContent.indexOf(pubDateEndTag, pubDateStartIndex);
 		const pubDate = itemContent.substring(pubDateStartIndex, pubDateEndIndex);
 		const fechaDolar = getDateBP(pubDate);
-		var valorDolar = Number(dolarDescription);
+		const valorDolar = Number(dolarDescription).toFixed(4);
 
 		if (valorDolar < precioMinimoPermitido) {
-			console.warn(`El valor del dólar ${valorDolar} es menor al precio mínimo permitido , Enviando ultima fecha y precio guardado en cache`);
-			//TODO: Verificar que es mejor, precio minimo o ultimo precio
-			return respuestatc(await env.kvdof.get("fecha",{ cacheTtl: 3600 }), await env.kvdof.get("precioMinimoPermitido",{ cacheTtl: 3600 }));
-		}else{
-			try {
-				await env.kvdof.put("precio",valorDolar.toString());
-				await env.kvdof.put("fecha",fechaDolar);
-			} catch (error) {
-				console.error(error);
-			}
+			console.warn(`El valor del dólar ${valorDolar} es menor al precio mínimo permitido , Enviando fecha y precio minimo`);
+			await saveDolar(env, precioMinimoPermitido, fechaDolar);
+			return;
 		}
-		// Prepare response
-		return respuestatc(fechaDolar, valorDolar);
+		console.log(`Guardando valor del dolar: ${valorDolar} con fecha: ${fechaDolar}`);
+		await saveDolar(env, valorDolar, fechaDolar);
 	},
 };

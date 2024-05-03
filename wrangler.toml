@@ -7,3 +7,9 @@ compatibility_flags = [ "nodejs_compat" ]
 kv_namespaces = [
   { binding = "kvdof", id = "774d8e0cc2634f4581cf2e36e91d5d13" }
 ]
+
+[triggers]
+crons = ["*/15 * * * mon-fri"]
+
+[placement]
+mode = "smart"
