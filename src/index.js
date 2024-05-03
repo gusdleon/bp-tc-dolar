@@ -61,7 +61,7 @@ export default {
 	 * @param {Object} ctx - El contexto de ejecución.
 	 */
 	async scheduled(event, env, ctx) {
-		const precioMinimoPermitido = Number(await env.kvdof.get("precioMinimo", { cacheTtl: 3600 })).toFixed(4);
+		const precioMinimoPermitido = Number(await env.kvdof.get("precioMinimoPermitido", { cacheTtl: 3600 })).toFixed(4);
 		console.log(`Precio minimo permitido: ${precioMinimoPermitido}`);
 		var xmlText = '';
 		// Intentamos obtener los datos XML de la URL proporcionada
