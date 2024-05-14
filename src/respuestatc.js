@@ -4,7 +4,7 @@
  * @param {number} dolarvalue - El valor del dólar.
  * @returns {Response} - La respuesta generada.
  */
-export function respuestatc(dolarDate, dolarvalue) {
+export function respuestatc(dolarDate, dolarvalue, ultAct) {
 	const responseBody = `<div class="col-md-12">`+
 		`\n\t<p class="tc-date">${dolarDate}</p>`+
 		`\n\t<p class="tc-value">$${dolarvalue}</p>`+
@@ -14,6 +14,7 @@ export function respuestatc(dolarDate, dolarvalue) {
 			'Content-Type': 'text/html; charset=utf-8',
 			'Vary': 'Accept-Encoding',
 			'Cache-Control': 'no-store, must-revalidate',
+			'Last-Modified': ultAct,
 		},
 	};
 	return new Response(responseBody, init);

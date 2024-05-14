@@ -44,7 +44,8 @@ export default {
 		// y se devuelve una respuesta con el valor del dólar y la fecha
 		const kVFecha = await env.kvdof.get("fecha", { cacheTtl: 3600 });
 		const kVPrecio = Number(await env.kvdof.get("precio", { cacheTtl: 3600 })).toFixed(4);
-		return respuestatc(kVFecha, kVPrecio);
+		const kVUltAct = await env.kvdof.get("ultimaAct", { cacheTtl: 3600 });
+		return respuestatc(kVFecha, kVPrecio, kVUltAct);
 	},
 	// #endregion
 
@@ -63,9 +64,9 @@ export default {
 	async scheduled(event, env, ctx) {
 		const precioMinimoPermitido = Number(await env.kvdof.get("precioMinimoPermitido", { cacheTtl: 3600 })).toFixed(4);
 		console.log(`Precio minimo permitido: ${precioMinimoPermitido}`);
-		var xmlText = '';
+
 		// Intentamos obtener los datos XML de la URL proporcionada
-		xmlText = await getxml();
+		const xmlText = await getxml();
 
 		//  Definimos las etiquetas de inicio y fin para extraer el valor del dólar y la fecha
 		const itemEndTag = '</item>';
@@ -87,12 +88,11 @@ export default {
 		const itemContent = xmlText.substring(startIndex, endIndex + itemEndTag.length);
 		const descriptionStartIndex = itemContent.indexOf(descriptionStartTag) + descriptionStartTag.length;
 		const descriptionEndIndex = itemContent.indexOf(descriptionEndTag, descriptionStartIndex);
-		const dolarDescription = itemContent.substring(descriptionStartIndex, descriptionEndIndex);
+		const valorDolar = Number(itemContent.substring(descriptionStartIndex, descriptionEndIndex)).toFixed(4);
+
 		const pubDateStartIndex = itemContent.indexOf(pubDateStartTag) + pubDateStartTag.length;
 		const pubDateEndIndex = itemContent.indexOf(pubDateEndTag, pubDateStartIndex);
-		const pubDate = itemContent.substring(pubDateStartIndex, pubDateEndIndex);
-		const fechaDolar = getDateBP(pubDate);
-		const valorDolar = Number(dolarDescription).toFixed(4);
+		const fechaDolar = getDateBP(itemContent.substring(pubDateStartIndex, pubDateEndIndex));
 
 		if (valorDolar < precioMinimoPermitido) {
 			console.warn(`El valor del dólar ${valorDolar} es menor al precio mínimo permitido, Enviando fecha y precio minimo`);

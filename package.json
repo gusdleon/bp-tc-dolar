@@ -5,6 +5,7 @@
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
+    "devCRON": "wrangler dev --test-scheduled",
     "start": "wrangler dev",
     "tail": "wrangler tail"
   },

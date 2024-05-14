@@ -9,6 +9,7 @@ export async function saveDolar(env, valorDolar, fechaDolar) {
 	try {
 		await env.kvdof.put("precio", valorDolar.toString());
 		await env.kvdof.put("fecha", fechaDolar);
+		await env.kvdof.put("ultimaAct", new Date().toUTCString());
 	} catch (error) {
 		console.error(error);
 	}
