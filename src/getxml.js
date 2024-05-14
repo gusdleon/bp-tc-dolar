@@ -6,12 +6,9 @@ export async function getxml() {
 	try {
 		// Realizamos una solicitud para obtener los datos XML de la URL proporcionada
 		// y configuramos el tiempo de vida en caché de la respuesta a 1 hora
-		const xml = await fetch('https://www.dof.gob.mx/indicadores.xml', {
-			cf: {
-				cacheTtl: 3600,
-				cacheEverything: true,
-			},
-		});
+		console.log("Iniciando fetch XML... " + Date.now());
+		const xml = await fetch('https://www.dof.gob.mx/indicadores.xml');
+		console.log("Fetch XML completado... " + Date.now());
 		if (!xml.ok) {
 			// Si la solicitud falla, lanzamos un error
 			throw new Error(`Failed to fetch XML data ${xml.status} - ${xml.statusText}`);

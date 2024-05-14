@@ -8,7 +8,7 @@ export function respuestatc(dolarDate, dolarvalue) {
 	const responseBody = `<div class="col-md-12">`+
 		`\n\t<p class="tc-date">${dolarDate}</p>`+
 		`\n\t<p class="tc-value">$${dolarvalue}</p>`+
-	`\n</div>\n`;
+		`\n</div>\n`;
 	const init = {
 		headers: {
 			'Content-Type': 'text/html; charset=utf-8',

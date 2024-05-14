@@ -1,4 +1,4 @@
-name = "dof-dolar-price"
+name = "bp-tc-dolar"
 main = "src/index.js"
 compatibility_date = "2024-03-07"
 workers_dev = true
@@ -9,7 +9,7 @@ kv_namespaces = [
 ]
 
 [triggers]
-crons = ["*/15 * * * mon-fri"]
+crons = ["*/15 13-14 * * mon-fri"]
 
 [placement]
 mode = "smart"
