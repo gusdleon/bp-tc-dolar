@@ -13,7 +13,7 @@ export function respuestatc(dolarDate, dolarvalue, ultAct) {
 		headers: {
 			'Content-Type': 'text/html; charset=utf-8',
 			'Vary': 'Accept-Encoding',
-			'Cache-Control': 'no-store, must-revalidate',
+			'Cache-Control': 'no-store',
 			'Last-Modified': ultAct,
 		},
 	};
