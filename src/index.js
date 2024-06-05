@@ -34,7 +34,20 @@ export default {
 		if (request.method !== "GET") {
 			console.warn("Método no permitido");
 			return new Response("Método no permitido", { status: 405 });
-		} else if (url.pathname !== "/MX/tc_barmesa/_tipo-de-cambio.html") {
+		}
+		if (url.pathname !== "/MX/tc_barmesa/_tipo-de-cambio.html") {
+			if(url.pathname == "/" || url.pathname == ""){
+				console.log("Redireccionando a /MX/tc_barmesa/_tipo-de-cambio.html");
+				if(url.port == ""){
+					return Response.redirect(`${url.protocol}${url.hostname}/MX/tc_barmesa/_tipo-de-cambio.html`, 302);
+				}else{
+					return Response.redirect(`${url.protocol}${url.hostname}:${url.port}/MX/tc_barmesa/_tipo-de-cambio.html`, 302);
+				}
+			}
+			if(url.pathname == "/favicon.ico"){
+				const fav = await env.kvdof.get("favicon", { cacheTtl: 3600, type: "stream"});
+				return new Response(fav, { headers: { "Content-Type": "image/png" } });
+			}
 			console.warn("URL no permitida");
 			return new Response("URL no permitida", { status: 403 });
 		}
