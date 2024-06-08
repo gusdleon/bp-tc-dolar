@@ -35,6 +35,16 @@ export default {
 			console.warn("Método no permitido");
 			return new Response("Método no permitido", { status: 405 });
 		}
+		if(request.headers.get("If-Modified-Since") != null){
+			console.log("Solicitud con If-Modified-Since");
+			const kVUltAct = await env.kvdof.get("ultimaAct");
+			const fecha = new Date(kVUltAct);
+			const fechaMod = new Date(request.headers.get("If-Modified-Since"));
+			if(fecha.getTime() <= fechaMod.getTime()){
+				console.log("Sin cambios");
+				return new Response(null, { status: 304, headers: {'Vary': 'Accept-Encoding','Cache-Control': 'no-store',} });
+			}
+		}
 		if (url.pathname !== "/MX/tc_barmesa/_tipo-de-cambio.html") {
 			if(url.pathname == "/" || url.pathname == ""){
 				console.log("Redireccionando a /MX/tc_barmesa/_tipo-de-cambio.html");
