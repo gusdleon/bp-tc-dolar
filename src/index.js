@@ -1,8 +1,3 @@
-import { getxml } from "./getxml";
-import { getDateBP } from "./getDateBP";
-import { saveDolar } from "./saveDolar";
-import { respuestatc } from "./respuestatc";
-
 /**
  * Módulo principal que exporta un objeto con dos funciones asincrónicas: fetch y scheduled.
  * La función fetch se encarga de manejar las solicitudes GET a la ruta "/MX/tc_barmesa/_tipo-de-cambio.html".
@@ -30,6 +25,7 @@ export default {
 		 * Si no cumple con las validaciones, se devuelve una respuesta
 		 * con el código de estado correspondiente.
 		 */
+		const {respuestatc} = await import("./respuestatc"); // Importación dinámica de la función respuestatc
 		const url = new URL(request.url);
 		if (request.method !== "GET") {
 			console.warn("Método no permitido");
@@ -65,6 +61,7 @@ export default {
 
 		// Se obtiene el valor del dólar guardado en la caché
 		// y se devuelve una respuesta con el valor del dólar y la fecha
+		// TODO: Obtener todos los valores de un solo KV, pues la consulta individual ronda entre los 15 y 20 ms C/U
 		const kVFecha = await env.kvdof.get("fecha", { cacheTtl: 3600 });
 		const kVPrecio = Number(await env.kvdof.get("precio", { cacheTtl: 3600 })).toFixed(4);
 		const kVUltAct = await env.kvdof.get("ultimaAct", { cacheTtl: 3600 });
@@ -85,6 +82,7 @@ export default {
 	 * @param {Object} ctx - El contexto de ejecución.
 	 */
 	async scheduled(event, env, ctx) {
+		const { getxml } = await import("./getxml"); // Importación dinámica de la función getxml
 		const precioMinimoPermitido = Number(await env.kvdof.get("precioMinimoPermitido", { cacheTtl: 3600 })).toFixed(4);
 		console.log(`Precio minimo permitido: ${precioMinimoPermitido}`);
 
@@ -107,6 +105,8 @@ export default {
 			return; // Si no se encuentra el valor del dólar, se finaliza la ejecución
 		}
 
+		const { getDateBP } = await import("./getDateBP"); // Importación dinámica de la función getDateBP
+		const { saveDolar } = await import("./saveDolar"); // Importación dinámica de la función saveDolar
 		// El precio del dólar se encuentra entre las etiquetas de descripción asi que lo extraemos y lo convertimos a un número
 		const itemContent = xmlText.substring(startIndex, endIndex + itemEndTag.length);
 		const descriptionStartIndex = itemContent.indexOf(descriptionStartTag) + descriptionStartTag.length;
