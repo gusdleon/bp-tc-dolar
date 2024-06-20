@@ -6,10 +6,13 @@
  * @returns {Promise<void>} - Una promesa que se resuelve cuando los valores se guardan correctamente.
  */
 export async function saveDolar(env, valorDolar, fechaDolar) {
+	const data = {
+		fecha: fechaDolar,
+		precio: Number(valorDolar).toFixed(4),
+		ultimaAct: new Date().toUTCString()
+	}
 	try {
-		await env.kvdof.put("precio", valorDolar.toString());
-		await env.kvdof.put("fecha", fechaDolar);
-		await env.kvdof.put("ultimaAct", new Date().toUTCString());
+		await env.kvdof.put("data", JSON.stringify(data));
 	} catch (error) {
 		console.error(error);
 	}

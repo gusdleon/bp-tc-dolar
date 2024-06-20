@@ -31,9 +31,10 @@ export default {
 			console.warn("Método no permitido");
 			return new Response("Método no permitido", { status: 405 });
 		}
+		const data = JSON.parse( await env.kvdof.get("data", { cacheTtl: 3600 }));
 		if(request.headers.get("If-Modified-Since") != null){
 			console.log("Solicitud con If-Modified-Since");
-			const kVUltAct = await env.kvdof.get("ultimaAct");
+			const kVUltAct = data.ultimaAct;
 			const fecha = new Date(kVUltAct);
 			const fechaMod = new Date(request.headers.get("If-Modified-Since"));
 			if(fecha.getTime() <= fechaMod.getTime()){
@@ -61,11 +62,7 @@ export default {
 
 		// Se obtiene el valor del dólar guardado en la caché
 		// y se devuelve una respuesta con el valor del dólar y la fecha
-		// TODO: Obtener todos los valores de un solo KV, pues la consulta individual ronda entre los 15 y 20 ms C/U
-		const kVFecha = await env.kvdof.get("fecha", { cacheTtl: 3600 });
-		const kVPrecio = Number(await env.kvdof.get("precio", { cacheTtl: 3600 })).toFixed(4);
-		const kVUltAct = await env.kvdof.get("ultimaAct", { cacheTtl: 3600 });
-		return respuestatc(kVFecha, kVPrecio, kVUltAct);
+		return respuestatc(data);
 	},
 	// #endregion
 
