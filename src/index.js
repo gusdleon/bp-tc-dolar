@@ -31,7 +31,8 @@ export default {
 			console.warn("Método no permitido");
 			return new Response("Método no permitido", { status: 405 });
 		}
-		const data = JSON.parse( await env.kvdof.get("data", { cacheTtl: 3600 }));
+		const kvdata = await env.kvdof.get("data", { cacheTtl: 3600 })
+		const data = JSON.parse( kvdata );
 		if(request.headers.get("If-Modified-Since") != null){
 			console.log("Solicitud con If-Modified-Since");
 			const kVUltAct = data.ultimaAct;
@@ -43,13 +44,21 @@ export default {
 			}
 		}
 		if (url.pathname !== "/MX/tc_barmesa/_tipo-de-cambio.html") {
-			if(url.pathname == "/" || url.pathname == ""){
+			if(url.pathname == "/" || url.pathname == "" || url.pathname == "/MX/tc_barmesa/_tipo-de-cambio"){
 				console.log("Redireccionando a /MX/tc_barmesa/_tipo-de-cambio.html");
 				if(url.port == ""){
 					return Response.redirect(`${url.protocol}${url.hostname}/MX/tc_barmesa/_tipo-de-cambio.html`, 302);
 				}else{
 					return Response.redirect(`${url.protocol}${url.hostname}:${url.port}/MX/tc_barmesa/_tipo-de-cambio.html`, 302);
 				}
+			}
+			if (url.pathname == "/MX/tc_barmesa/_tipo-de-cambio.json"){
+				return new Response(kvdata,{
+					headers:{
+						'status': '200',
+						'Content-Type': 'application/json; charset=utf-8'
+					}
+				});
 			}
 			if(url.pathname == "/favicon.ico"){
 				const fav = await env.kvdof.get("favicon", { cacheTtl: 3600, type: "stream"});

@@ -9,7 +9,7 @@ kv_namespaces = [
 ]
 
 [triggers]
-crons = ["*/15 13-14 * * mon-fri"]
+crons = ["*/15 13 * * mon-fri"]
 
 [placement]
 mode = "smart"
