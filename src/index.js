@@ -31,7 +31,7 @@ export default {
 			console.warn("Método no permitido");
 			return new Response("Método no permitido", { status: 405 });
 		}
-		const kvdata = await env.kvdof.get("data", { cacheTtl: 3600 })
+		const kvdata = await env.tc.get("data", { cacheTtl: 3600 })
 		const data = JSON.parse( kvdata );
 		if(request.headers.get("If-Modified-Since") != null){
 			console.log("Solicitud con If-Modified-Since");
@@ -61,7 +61,7 @@ export default {
 				});
 			}
 			if(url.pathname == "/favicon.ico"){
-				const fav = await env.kvdof.get("favicon", { cacheTtl: 3600, type: "stream"});
+				const fav = await env.tc.get("favicon", { cacheTtl: 3600, type: "stream"});
 				return new Response(fav, { headers: { "Content-Type": "image/png" } });
 			}
 			console.warn("URL no permitida");
@@ -89,7 +89,7 @@ export default {
 	 */
 	async scheduled(event, env, ctx) {
 		const { getxml } = await import("./getxml"); // Importación dinámica de la función getxml
-		const precioMinimoPermitido = Number(await env.kvdof.get("precioMinimoPermitido", { cacheTtl: 3600 })).toFixed(4);
+		const precioMinimoPermitido = Number(await env.tc.get("precioMinimoPermitido", { cacheTtl: 3600 })).toFixed(4);
 		console.log(`Precio minimo permitido: ${precioMinimoPermitido}`);
 
 		// Intentamos obtener los datos XML de la URL proporcionada

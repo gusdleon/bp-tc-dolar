@@ -12,7 +12,7 @@ export async function saveDolar(env, valorDolar, fechaDolar) {
 		ultimaAct: new Date().toUTCString()
 	}
 	try {
-		await env.kvdof.put("data", JSON.stringify(data));
+		await env.tc.put("data", JSON.stringify(data));
 	} catch (error) {
 		console.error(error);
 	}
