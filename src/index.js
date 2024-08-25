@@ -16,7 +16,7 @@ export default {
 	 * @param {Request} request - La solicitud HTTP recibida.
 	 * @param {Object} env - El entorno de ejecución.
 	 * @param {Object} ctx - El contexto de ejecución.
-	 * @returns {Response} - La respuesta HTTP con el valor del dólar.
+	 * @returns {Promise<Response>} - La respuesta HTTP con el valor del dólar.
 	 */
 	async fetch(request, env, ctx) {
 		// #region Validaciones de la solicitud
