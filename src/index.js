@@ -31,8 +31,7 @@ export default {
 			console.warn("Método no permitido");
 			return new Response("Método no permitido", { status: 405 });
 		}
-		const kvdata = await env.tc.get("data", { cacheTtl: 3600 })
-		const data = JSON.parse( kvdata );
+		const data = JSON.parse( await env.tc.get("data", { cacheTtl: 3600}) );
 		if(request.headers.get("If-Modified-Since") != null){
 			console.log("Solicitud con If-Modified-Since");
 			const kVUltAct = data.ultimaAct;
@@ -53,12 +52,7 @@ export default {
 				}
 			}
 			if (url.pathname == "/MX/tc_barmesa/_tipo-de-cambio.json"){
-				return new Response(kvdata,{
-					headers:{
-						'status': '200',
-						'Content-Type': 'application/json; charset=utf-8'
-					}
-				});
+				return Response.json(data);
 			}
 			if(url.pathname == "/favicon.ico"){
 				const fav = await env.tc.get("favicon", { cacheTtl: 3600, type: "stream"});
