@@ -9,7 +9,10 @@ kv_namespaces = [
 ]
 
 [triggers]
-crons = ["*/15 13 * * mon-fri"]
+crons = ["*/15 13 * * mon-fri", "0-15/15 14 * * mon-fri" ]
 
 [placement]
 mode = "smart"
+
+[observability]
+enabled = true
