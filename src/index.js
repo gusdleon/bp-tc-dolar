@@ -25,7 +25,6 @@ export default {
 		 * Si no cumple con las validaciones, se devuelve una respuesta
 		 * con el código de estado correspondiente.
 		 */
-		const {respuestatc} = await import("./respuestatc"); // Importación dinámica de la función respuestatc
 		const url = new URL(request.url);
 		if (request.method !== "GET") {
 			console.warn("Método no permitido");
@@ -65,6 +64,7 @@ export default {
 
 		// Se obtiene el valor del dólar guardado en la caché
 		// y se devuelve una respuesta con el valor del dólar y la fecha
+		const {respuestatc} = await import("./respuestatc"); // Importación dinámica de la función respuestatc
 		return respuestatc(data);
 	},
 	// #endregion
@@ -82,9 +82,9 @@ export default {
 	 * @param {Object} ctx - El contexto de ejecución.
 	 */
 	async scheduled(event, env, ctx) {
-		const { getxml } = await import("./getxml"); // Importación dinámica de la función getxml
 		const precioMinimoPermitido = Number(await env.tc.get("precioMinimoPermitido", { cacheTtl: 3600 })).toFixed(4);
 		console.log(`Precio minimo permitido: ${precioMinimoPermitido}`);
+		const { getxml } = await import("./getxml"); // Importación dinámica de la función getxml
 
 		// Intentamos obtener los datos XML de la URL proporcionada
 		const xmlText = await getxml();
@@ -105,8 +105,6 @@ export default {
 			return; // Si no se encuentra el valor del dólar, se finaliza la ejecución
 		}
 
-		const { getDateBP } = await import("./getDateBP"); // Importación dinámica de la función getDateBP
-		const { saveDolar } = await import("./saveDolar"); // Importación dinámica de la función saveDolar
 		// El precio del dólar se encuentra entre las etiquetas de descripción asi que lo extraemos y lo convertimos a un número
 		const itemContent = xmlText.substring(startIndex, endIndex + itemEndTag.length);
 		const descriptionStartIndex = itemContent.indexOf(descriptionStartTag) + descriptionStartTag.length;
@@ -115,7 +113,9 @@ export default {
 
 		const pubDateStartIndex = itemContent.indexOf(pubDateStartTag) + pubDateStartTag.length;
 		const pubDateEndIndex = itemContent.indexOf(pubDateEndTag, pubDateStartIndex);
+		const { getDateBP } = await import("./getDateBP"); // Importación dinámica de la función getDateBP
 		const fechaDolar = getDateBP(itemContent.substring(pubDateStartIndex, pubDateEndIndex));
+		const { saveDolar } = await import("./saveDolar"); // Importación dinámica de la función saveDolar
 
 		if (valorDolar < precioMinimoPermitido) {
 			console.warn(`El valor del dólar ${valorDolar} es menor al precio mínimo permitido, Enviando fecha y precio minimo`);
